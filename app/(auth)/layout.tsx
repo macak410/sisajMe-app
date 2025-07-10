@@ -21,7 +21,7 @@ export default async function RootLayout({
                 src="/assets/imgs/logo.svg"
                 width={1000}
                 height={1000}
-                alt="NextCut"
+                alt="ŠišajMe logo"
                 className="h-10 w-fit"
               />
             </Link>
@@ -30,7 +30,7 @@ export default async function RootLayout({
           {children}
 
           <div className="text-textGray-500 mt-16">
-            <p>© NextCut | All rights reserved</p>
+            <p>© ŠišajMe | All rights reserved</p>
           </div>
         </div>
       </section>
