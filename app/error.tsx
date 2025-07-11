@@ -1,21 +1,25 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-
-export default function Error({ error, reset }: { error: Error; reset: () => void }) {
-  useEffect(() => {
-    console.error(error);
-  }, [error]);
-
+const Error = ({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) => {
   return (
-    <div className="p-8 text-center">
-      <h2 className="text-xl font-bold mb-4">Nešto je pošlo po zlu 😬</h2>
+    <main className="flex justify-center items-center py-32 flex-col gap-6">
+      <h1 className="text-3xl font-semibold">Nešto je pošlo po zlu!</h1>
+      <p className="text-lg">{error.message}</p>
+
       <button
-        onClick={() => reset()}
-        className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        className="inline-block bg-accent-500 text-primary-800 px-6 py-3 text-lg"
+        onClick={reset}
       >
-        Pokušaj ponovno
+        Pokušajte ponovno
       </button>
-    </div>
+    </main>
   );
-}
+};
+
+export default Error;

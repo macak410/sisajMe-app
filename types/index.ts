@@ -11,6 +11,20 @@ export interface SignupParams {
   customerId?: string;
 }
 
+export interface LogInProps {
+  email: string;
+  password: string;
+}
+
+export interface CreateAppointmentParams {
+  userId: string;
+  customer: string;
+  barber: string;
+  serviceType: string;
+  scheduleDate: Date;
+  status: string;
+}
+
 export interface Customer extends Models.Document {
   customerId: string;
   fullName: string;

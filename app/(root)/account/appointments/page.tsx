@@ -15,10 +15,10 @@ const AppointmentPage = async () => {
       <div>
         <BackButton />
         <h2 className="font-semibold text-2xl text-accent-400 mb-7">
-          Your reservations
+          Vaše rezervacije
         </h2>
         <p className="text-lg">
-          You are not logged in. Please log in to view your appointments.
+          Niste prijavljeni. Molimo vas da se prijavite kako biste vidjeli svoje termine.
         </p>
       </div>
     );
@@ -30,11 +30,11 @@ const AppointmentPage = async () => {
     <div>
       <BackButton />
       <h2 className="font-semibold text-2xl text-accent-400 mb-7">
-        Your reservations
+        Vaše rezervacije
       </h2>
 
       {appointments.length === 0 ? (
-        <p className="text-lg">You have no appointments yet</p>
+        <p className="text-lg">Još nemate zakazanih termina</p>
       ) : (
         <AppointmentsList appointments={appointments} />
       )}

@@ -23,11 +23,11 @@ const ConfirmedPage = async ({ params, searchParams }: ConfirmedPageProps) => {
       <div className="m-auto flex flex-col items-center justify-between gap-10 py-10">
         <Link href="/" className="mb-8">
           <Image
-            src="/assets/imgs/logo.svg"
+            src="/assets/imgs/logo-barbershop.jpg"
             width={1000}
             height={1000}
             alt="logo"
-            className="h-10 w-fit"
+            className="h-40 w-fit"
           />
         </Link>
 
@@ -39,18 +39,18 @@ const ConfirmedPage = async ({ params, searchParams }: ConfirmedPageProps) => {
             alt="confirmed"
           />
           <h1 className="heading-h1 max-w-[42rem] text-center">
-            Your appointment has been{" "}
-            <span className="text-green-500">successfully</span> submitted
+            Vaš termin je {" "}
+            <span className="text-green-500">uspješno</span> poslan
           </h1>
           <p className="text-textGray-500 mt-2.5 mb-8">
-            Please wait for admin approval.
+            Molimo pričekajte odobrenje administratora.
           </p>
-          <Button href="/">Go to Home</Button>
+          <Button href="/">Idi na početnu stranicu</Button>
         </section>
 
         <section className="text-textGray-500 flex w-full flex-col items-center gap-8 border-y-2 border-dark-400 py-8 md:w-fit md:flex-row">
           <h3 className="text-white font-medium text-2xl">
-            Appointment Details
+            Detalji termina
           </h3>
           <p>{appointment.barber}</p>
           <p>{appointment.serviceType}</p>
@@ -62,7 +62,7 @@ const ConfirmedPage = async ({ params, searchParams }: ConfirmedPageProps) => {
             href={`/account/appointments/edit/${appointment.$id}`}
             className="text-yellow-500 hover:text-yellow-400 font-medium cursor-pointer"
           >
-            Edit appointment
+            Uredi termin
           </Link>
         </section>
       </div>

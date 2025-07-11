@@ -3,7 +3,7 @@ import { getAppointment } from "@/lib/actions/appointment.action";
 import { getCustomer, getLoggedInUser } from "@/lib/actions/customer.actions";
 
 export const metadata = {
-  title: "Edit Appointment | NextCut",
+  title: "Edit Appointment | ŠišajMe",
 };
 
 const EditAppointment = async ({

@@ -10,11 +10,11 @@ const layout = ({ children }: { children: React.ReactNode }) => {
           <div>
             <Link href="/" className="inline-block mb-12">
               <Image
-                src="/assets/imgs/logo.svg"
+                src="/assets/imgs/logo-barbershop.jpg"
                 width={1000}
                 height={1000}
                 alt="logo"
-                className="h-10 w-fit"
+                className="h-40 w-fit"
               />
             </Link>
           </div>

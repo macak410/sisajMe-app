@@ -14,11 +14,11 @@ const Home = async () => {
           <div>
             <Link href="/" className="inline-block mb-12">
               <Image
-                src="/assets/imgs/logo.svg"
+                src="/assets/imgs/logo-barbershop.jpg"
                 width={1000}
                 height={1000}
                 alt="logo"
-                className="h-10 w-fit"
+                className="h-40 w-fit"
               />
             </Link>
           </div>
@@ -27,18 +27,17 @@ const Home = async () => {
             {loggedUser && (
               <>
                 <h1 className="heading-h1">
-                  Welcome,{" "}
+                  Dobrodošli,{" "}
                   {loggedUser ? loggedUser.name.split(" ").at(0) : "Guest"} 👋
                 </h1>
                 <p className="text-textGray-500 mt-5 mb-10">
-                  Your perfect cut, just a tap away. Get your appointment in
-                  seconds!
+                  Vaša savršena frizura u samo nekoliko klikova. Zakažite svoj termin u par sekundi!
                 </p>
                 <Button
                   href={`customers/${loggedUser.$id}/new-appointment`}
                   className="self-start"
                 >
-                  Get Appointment
+                  Zakažite termin
                 </Button>
               </>
             )}
@@ -49,9 +48,9 @@ const Home = async () => {
               href="/account"
               className="text-yellow-500 hover:text-yellow-400 text-lg font-medium"
             >
-              Account Settings
+              Postavke računa
             </Link>
-            <p className="text-textGray-500">© NextCut | All rights reserved</p>
+            <p className="text-textGray-500">© ŠišajMe | All rights reserved</p>
           </div>
         </div>
       </section>

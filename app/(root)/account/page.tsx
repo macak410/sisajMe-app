@@ -14,9 +14,9 @@ const AccountPage = () => {
       </div>
 
       <div className="space-y-5">
-        <h3 className="text-3xl font-bold">Welcome 👋</h3>
+        <h3 className="text-3xl font-bold">Dobrodošli 👋</h3>
         <p className="text-lg font-medium text-textGray-500">
-          Here you can edit your appointments and manage your account.
+          Ovdje možete uređivati ​​svojim terminima.
         </p>
       </div>
     </div>
