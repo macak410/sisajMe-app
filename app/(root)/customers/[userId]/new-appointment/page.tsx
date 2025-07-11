@@ -37,6 +37,7 @@ const Appointment = async ({ params }: AppointmentParams) => {
               <AppointmentForm
                 userId={params.userId}
                 customerId={customer.$id}
+                customer={customer}
               />
             )}
           </div>

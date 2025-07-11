@@ -7,26 +7,18 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { useForm } from "react-hook-form";
-import Select, {
-  type CSSObjectWithLabel,
-  type OptionProps,
-} from "react-select";
+import { useForm, Controller } from "react-hook-form";
+import Select, { StylesConfig } from "react-select";
 import Button from "../Button";
 import DateSelector from "../DateSelector";
 import FormRow from "./FormRow";
-import { Appointment } from "@/types/appwrite.types";
+import { Appointment, Customer } from "@/types/appwrite.types";
 
 interface AppointmentProps {
   userId: string;
   customerId: string;
+  customer: Customer;
   appointmentToEdit?: Appointment;
-}
-
-interface Inputs {
-  barber: string;
-  service: string;
-  date: string;
 }
 
 interface OptionType {
@@ -34,25 +26,30 @@ interface OptionType {
   label: string;
 }
 
-const barberOptions = [
+interface Inputs {
+  barber: OptionType;
+  service: OptionType;
+}
+
+const barberOptions: OptionType[] = [
   { value: "Ivo Ivić", label: "Ivo Ivić" },
   { value: "Marko Marić", label: "Marko Marić" },
   { value: "Maja Majić", label: "Maja Majić" },
 ];
 
-const serviceOptions = [
+const serviceOptions: OptionType[] = [
   { value: "Normalno kratko šišanje", label: "Normalno kratko šišanje" },
   { value: "Šišanje", label: "Šišanje" },
   { value: "Šišanje i bojanje", label: "Šišanje i bojanje" },
   { value: "Brijanje", label: "Brijanje" },
 ];
 
-const selectStyles = {
-  singleValue: (provided: CSSObjectWithLabel) => ({
+const selectStyles: StylesConfig<OptionType, false> = {
+  singleValue: (provided) => ({
     ...provided,
     color: "white",
   }),
-  control: (provided: CSSObjectWithLabel) => ({
+  control: (provided) => ({
     ...provided,
     backgroundColor: "#262626",
     borderRadius: "6px",
@@ -60,11 +57,11 @@ const selectStyles = {
     borderColor: "#4F4F4F",
     boxShadow: "none",
   }),
-  menu: (provided: CSSObjectWithLabel) => ({
+  menu: (provided) => ({
     ...provided,
     backgroundColor: "#262626",
   }),
-  option: (provided: CSSObjectWithLabel, state: OptionProps) => ({
+  option: (provided, state) => ({
     ...provided,
     backgroundColor: state.isSelected ? "#1D1D1D" : "#262626",
   }),
@@ -73,57 +70,45 @@ const selectStyles = {
 const AppointmentForm = ({
   userId,
   customerId,
+  customer,
   appointmentToEdit,
 }: AppointmentProps) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [barberOption, setBarberOption] = useState<OptionType | null>(null);
-  const [serviceOption, setServiceOption] = useState<OptionType | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const router = useRouter();
-  const { handleSubmit } = useForm<Inputs>();
 
-  const onSubmit = async () => {
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<Inputs>();
+
+  const onSubmit = async (data: Inputs) => {
+    if (!startDate) return;
+
     setIsLoading(true);
     try {
-      if (appointmentToEdit && barberOption && serviceOption && startDate) {
-        const appointment = {
-          userId,
-          customer: customerId,
-          barber: barberOption.value,
-          serviceType: serviceOption.value,
-          scheduleDate: startDate,
-          status: "pending",
-        };
+      const appointmentPayload = {
+        userId,
+        customer: customerId,
+        customerName: customer.fullName,
+        barber: data.barber.value,
+        serviceType: data.service.value,
+        scheduleDate: startDate,
+        status: "pending",
+      };
 
-        const editedAppointment = await editAppointment(
-          appointmentToEdit.$id,
-          userId,
-          appointment
+      const response = appointmentToEdit
+        ? await editAppointment(appointmentToEdit.$id, userId, appointmentPayload)
+        : await createAppointment(appointmentPayload);
+
+      if (response) {
+        router.push(
+          `/customers/${userId}/new-appointment/confirmed?appointmentId=${response.$id}`
         );
-
-        if (editedAppointment)
-          router.push(
-            `/customers/${userId}/new-appointment/confirmed?appointmentId=${editedAppointment.$id}`
-          );
-      } else if (barberOption && serviceOption && startDate) {
-        const appointment = {
-          userId,
-          customer: customerId,
-          barber: barberOption.value,
-          serviceType: serviceOption.value,
-          scheduleDate: startDate,
-          status: "pending",
-        };
-
-        const newAppointment = await createAppointment(appointment);
-
-        if (newAppointment)
-          router.push(
-            `/customers/${userId}/new-appointment/confirmed?appointmentId=${newAppointment.$id}`
-          );
       }
     } catch (err: any) {
-      console.error(err.message);
+      console.error("Greška pri zakazivanju termina:", err.message);
     } finally {
       setIsLoading(false);
     }
@@ -133,44 +118,66 @@ const AppointmentForm = ({
     <form onSubmit={handleSubmit(onSubmit)} className="flex-1 space-y-6">
       {!appointmentToEdit && (
         <section className="mb-12 space-y-4">
-          <h1 className="heading-h1">Zakažite svoju termin ✂️</h1>
-          <p className="text-textGray-500">
-           Pošaljite zahtjev za vaš termin
-          </p>
+          <h1 className="heading-h1">Zakažite svoj termin ✂️</h1>
+          <p className="text-textGray-500">Pošaljite zahtjev za vaš termin</p>
         </section>
       )}
 
       <div className="space-y-5">
-        <FormRow label="Available barbers" htmlFor="barber">
-          <Select
+        <FormRow label="Frizeri" htmlFor="barber">
+          <Controller
             name="barber"
-            styles={selectStyles}
-            options={barberOptions}
-            isDisabled={isLoading}
-            onChange={(option) => setBarberOption(option as OptionType)}
+            control={control}
+            rules={{ required: "Odaberite frizera" }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                styles={selectStyles}
+                options={barberOptions}
+                isDisabled={isLoading}
+                placeholder="Odaberite frizera"
+              />
+            )}
           />
+          {errors.barber && (
+            <p className="text-red-500 text-sm mt-1">{errors.barber.message}</p>
+          )}
         </FormRow>
 
-        <FormRow label="Service type" htmlFor="service">
-          <Select
-            name="serviceType"
-            options={serviceOptions}
-            styles={selectStyles}
-            isDisabled={isLoading}
-            onChange={(option) => setServiceOption(option as OptionType)}
+        <FormRow label="Vrsta usluge" htmlFor="service">
+          <Controller
+            name="service"
+            control={control}
+            rules={{ required: "Odaberite uslugu" }}
+            render={({ field }) => (
+              <Select
+                {...field}
+                styles={selectStyles}
+                options={serviceOptions}
+                isDisabled={isLoading}
+                placeholder="Odaberite vrstu usluge"
+              />
+            )}
           />
+          {errors.service && (
+            <p className="text-red-500 text-sm mt-1">{errors.service.message}</p>
+          )}
         </FormRow>
 
-        <FormRow label="Appointment date" htmlFor="appointmentDate">
+        <FormRow label="Datum termina" htmlFor="appointmentDate">
           <DateSelector
             startDate={startDate}
             setStartDate={setStartDate}
             isLoading={isLoading}
+            showError={!startDate}
           />
         </FormRow>
       </div>
 
-      <Button size="full" disabled={isLoading}>
+      <Button
+        size="full"
+        disabled={isLoading || !startDate || Object.keys(errors).length > 0}
+      >
         Pošalji
       </Button>
     </form>

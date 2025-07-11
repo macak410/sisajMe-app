@@ -11,12 +11,14 @@ import { useRouter } from "next/navigation";
 import { signUpClient, logInClient, getCurrentClientUser } from "@/lib/auth.client";
 import { createCustomerOnServer } from "@/lib/actions/customer.actions";
 import { Gender, SignupParams } from "@/types";
+import { sanitizeAppwriteId } from "@/lib/utils";
 
 interface Inputs extends SignupParams {}
 
 const RegisterForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -29,19 +31,25 @@ const RegisterForm = () => {
     try {
       await signUpClient(data.email, data.password, data.fullName);
       await logInClient(data.email, data.password);
+
       const user = await getCurrentClientUser();
+
+      const rawId = user.$id;
+      if (!user?.$id) throw new Error("user ID nije definiran");
+
+      const safeId = sanitizeAppwriteId(rawId);             
 
       await createCustomerOnServer({
         fullName: data.fullName,
         email: data.email,
         phone: data.phone,
         gender: data.gender,
-        customerId: user.$id,
-        password: "",
+        customerId: safeId,
+        password: "", 
       });
 
       toast.success("Registracija uspješna!");
-      router.push("/account");
+      router.push("/success");
     } catch (err) {
       console.error("Greška:", err);
       toast.error("Registracija nije uspjela.");
@@ -106,20 +114,56 @@ const RegisterForm = () => {
         </div>
 
         <FormRow label="Lozinka" htmlFor="password" error={errors?.password?.message}>
-          <input
-            type="password"
-            id="password"
-            placeholder="********"
-            disabled={isLoading}
-            className="input"
-            {...register("password", {
-              required: "Obavezno polje.",
-              minLength: {
-                value: 8,
-                message: "Lozinka mora imati najmanje 8 znakova.",
-              },
-            })}
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              placeholder="********"
+              disabled={isLoading}
+              className="input pr-10" // ostavi prostor za ikonu
+              {...register("password", {
+                required: "Obavezno polje.",
+                minLength: {
+                  value: 8,
+                  message: "Lozinka mora imati najmanje 8 znakova.",
+                },
+              })}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            >
+              {showPassword ? (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M17.94 17.94A10.94 10.94 0 0112 20C7.03 20 2.73 16.11 1 12a16.88 16.88 0 013.36-5.28M9.88 9.88A3 3 0 0114.12 14.12M3 3l18 18" />
+                </svg> // oko precrtan
+              ) : (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-5 w-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                  <circle cx="12" cy="12" r="3" />
+                </svg> // oko otvoren
+              )}
+            </button>
+          </div>
         </FormRow>
 
         <FormRow label="Spol" htmlFor="gender" error={errors?.gender?.message}>
@@ -132,7 +176,6 @@ const RegisterForm = () => {
             <option value="">Odaberite...</option>
             <option value="Male">Muško</option>
             <option value="Female">Žensko</option>
-            <option value="Other">Drugo</option>
           </select>
         </FormRow>
       </div>

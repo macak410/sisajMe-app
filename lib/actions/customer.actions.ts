@@ -1,29 +1,38 @@
 "use server";
 
-import { AppwriteException, ID, Query } from "node-appwrite";
+import { ID, Query } from "node-appwrite";
 import { createAdminClient, createSessionClient } from "../appwrite.config";
 import { cookies } from "next/headers";
-import { parseStringify } from "../utils";
+import { parseStringify, sanitizeAppwriteId } from "../utils";
 import { type LogInProps, type SignupParams } from "@/types";
 import { type Customer } from "@/types/appwrite.types";
 import { redirect } from "next/navigation";
 
-const { DATABASE_ID, CUSTOMER_COLLECTION_ID } = process.env;
+const databaseId = process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID;
+const collectionId = process.env.CUSTOMER_COLLECTION_ID;
+
+if (!databaseId || typeof databaseId !== "string")
+  throw new Error("NEXT_PUBLIC_APPWRITE_DATABASE_ID nije definiran ili nije string.");
+if (!collectionId || typeof collectionId !== "string")
+  throw new Error("CUSTOMER_COLLECTION_ID nije definiran ili nije string.");
 
 export const getCustomer = async (customerId: string): Promise<Customer> => {
   try {
     const { database } = await createAdminClient();
 
     const customer = await database.listDocuments(
-      DATABASE_ID!,
-      CUSTOMER_COLLECTION_ID!,
+      databaseId,
+      collectionId,
       [Query.equal("customerId", [customerId])]
     );
 
-    if (!customer) throw new Error("Pogreška pri pronalaženju valjanog korisnika.");
+    if (!customer?.documents?.[0]) {
+      throw new Error("Pogreška pri pronalaženju valjanog korisnika.");
+    }
 
     return parseStringify(customer.documents[0]);
   } catch (err) {
+    console.error("getCustomer error:", err);
     throw err;
   }
 };
@@ -31,8 +40,13 @@ export const getCustomer = async (customerId: string): Promise<Customer> => {
 export const logIn = async ({ email, password }: LogInProps) => {
   const { account } = await createAdminClient();
 
-  const session = await account.createEmailPasswordSession(email, password);
+  const currentSession = await account.getSession("current").catch(() => null);
+  if (currentSession) {
+    console.warn("👤 Već postoji aktivna sesija — login nije potreban.");
+    return currentSession;
+  }
 
+  const session = await account.createEmailPasswordSession(email, password);
   if (!session) throw new Error("Pogreška pri logiranju korisnika.");
 
   cookies().set("auth-session", session.secret, {
@@ -50,46 +64,36 @@ export const signUp = async ({
   ...customerData
 }: SignupParams): Promise<Customer> => {
   const { email, fullName } = customerData;
+  const { account, database } = await createAdminClient();
 
-  try {
-    const { account, database } = await createAdminClient();
+  const newAccount = await account.create(ID.unique(), email, password, fullName);
+  if (!newAccount) throw new Error("Pogreška pri stvaranju računa");
 
-    const newAccount = await account.create(
-      ID.unique(),
-      email,
-      password,
-      fullName
-    );
+  const { customerId: _, ...cleanCustomerData } = customerData;
 
-    if (!newAccount) throw new Error("Pogreška pri stvaranju računa");
+  const newCustomer = await database.createDocument(
+    databaseId,
+    collectionId,
+    ID.unique(),
+    {
+      ...cleanCustomerData,
+      customerId: newAccount.$id,
+    }
+  );
 
-    const newCustomer = await database.createDocument(
-      DATABASE_ID!,
-      CUSTOMER_COLLECTION_ID!,
-      ID.unique(),
-      {
-        ...customerData,
-        customerId: newAccount.$id,
-      }
-    );
+  if (!newCustomer) throw new Error("Pogreška pri stvaranju klijenta");
 
-    if (!newCustomer) throw new Error("Pogreška pri stvaranju klijenta");
+  const session = await account.createEmailPasswordSession(email, password);
+  if (!session) throw new Error("Pogreška pri kreiranju sign-up sesije.");
 
-    const session = await account.createEmailPasswordSession(email, password);
+  cookies().set("auth-session", session.secret, {
+    path: "/",
+    httpOnly: true,
+    sameSite: "strict",
+    secure: true,
+  });
 
-    if (!session) throw new Error("Pogreška pri stvaranju sign-upa-.");
-
-    cookies().set("auth-session", session.secret, {
-      path: "/",
-      httpOnly: true,
-      sameSite: "strict",
-      secure: true,
-    });
-
-    return parseStringify(newCustomer);
-  } catch (err) {
-    throw err;
-  }
+  return parseStringify(newCustomer);
 };
 
 export const logout = async () => {
@@ -100,6 +104,7 @@ export const logout = async () => {
     await account.deleteSession("current");
     redirect("/sign-in");
   } catch (err) {
+    console.error("Logout greška:", err);
     return null;
   }
 };
@@ -107,11 +112,16 @@ export const logout = async () => {
 export const getLoggedInUser = async () => {
   try {
     const { account } = await createSessionClient();
-
     const user = await account.get();
+
+    if (!user?.$id || typeof user.$id !== "string") {
+      console.warn("Neispravan user ID:", user?.$id);
+      return null;
+    }
 
     return parseStringify(user);
   } catch (err) {
+    console.error("getLoggedInUser error:", err);
     return null;
   }
 };
@@ -124,25 +134,31 @@ export const createCustomerOnServer = async ({
   customerId,
   password,
 }: SignupParams): Promise<Customer> => {
-  try {
-    const { database } = await createAdminClient();
+  const { database } = await createAdminClient();
 
-    const newCustomer = await database.createDocument(
-      process.env.NEXT_PUBLIC_APPWRITE_DATABASE_ID!,
-      process.env.CUSTOMER_COLLECTION_ID!,
-      ID.unique(),
-      {
-        fullName,
-        email,
-        phone,
-        gender,
-        customerId,
-        password, // ⚠ možeš ga ukloniti ako ne želiš spremati raw lozinku
-      }
-    );
+  if (!customerId) throw new Error("customerId nije definiran!");
+  const safeCustomerId = sanitizeAppwriteId(customerId);
 
-    return parseStringify(newCustomer);
-  } catch (err) {
-    throw err;
-  }
+  console.log("Šaljem payload Appwrite-u:", {
+    fullName,
+    email,
+    phone,
+    gender,
+    customerId: safeCustomerId,
+  });
+
+  const newCustomer = await database.createDocument(
+    databaseId,
+    collectionId,
+    ID.unique(),
+    {
+      fullName,
+      email,
+      phone,
+      gender,
+      customerId: safeCustomerId,
+    }
+  );
+
+  return parseStringify(newCustomer);
 };
