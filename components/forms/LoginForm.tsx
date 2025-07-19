@@ -26,7 +26,7 @@ const LoginForm = () => {
 
       const response = await logIn({ email, password });
 
-      router.push("/");
+      router.push("/account");
     } catch (err: any) {
       setError("Pogrešni korisnički podatci. Pokušajte ponovno!");
     } finally {
@@ -42,7 +42,7 @@ const LoginForm = () => {
       </div>
 
       <div className="flex flex-col gap-2.5">
-        <FormRow label="E-mail" htmlFor="email">
+        <FormRow label="E-mail :" htmlFor="email">
           <input
             type="email"
             className="input"
@@ -53,7 +53,7 @@ const LoginForm = () => {
             disabled={isLoading}
           />
         </FormRow>
-        <FormRow label="Password" htmlFor="password">
+        <FormRow label="Password :" htmlFor="password">
           <input
             type="password"
             className="input"

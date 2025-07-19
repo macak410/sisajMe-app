@@ -6,22 +6,22 @@ const layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="flex h-screen max-h-screen">
       <section className="container my-auto">
-        <div className="sub-container max-w-[860px] justify-between">
-          <div>
-            <Link href="/" className="inline-block mb-12">
+        <div className="sub-container max-w-[1400px] justify-between">
+          <div className="w-full mb-12 text-center md:text-left">
+            <Link href="/account" className="inline-block">
               <Image
                 src="/assets/imgs/logo-barbershop.jpg"
                 width={1000}
                 height={1000}
                 alt="logo"
-                className="h-40 w-fit"
+                className="h-40 w-auto mx-auto md:mx-0"
               />
             </Link>
           </div>
 
           {children}
 
-          <p className="text-textGray-500 mt-16">
+          <p className="text-textGray-500 mt-16 md:text-left text-center text-sm">
             © ŠišajMe | All rights reserved
           </p>
         </div>

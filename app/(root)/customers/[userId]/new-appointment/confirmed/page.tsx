@@ -21,7 +21,7 @@ const ConfirmedPage = async ({ params, searchParams }: ConfirmedPageProps) => {
   return (
     <div className="flex h-screen min-h-screen px-[5%]">
       <div className="m-auto flex flex-col items-center justify-between gap-10 py-10">
-        <Link href="/" className="mb-8">
+        <Link href="/account" className="mb-8">
           <Image
             src="/assets/imgs/logo-barbershop.jpg"
             width={1000}
@@ -45,7 +45,7 @@ const ConfirmedPage = async ({ params, searchParams }: ConfirmedPageProps) => {
           <p className="text-textGray-500 mt-2.5 mb-8">
             Molimo pričekajte odobrenje administratora.
           </p>
-          <Button href="/">Idi na početnu stranicu</Button>
+          <Button href="/account">Idi na početnu stranicu</Button>
         </section>
 
         <section className="text-textGray-500 flex w-full flex-col items-center gap-8 border-y-2 border-dark-400 py-8 md:w-fit md:flex-row">

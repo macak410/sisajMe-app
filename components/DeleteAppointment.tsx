@@ -5,7 +5,12 @@ import { getLoggedInUser } from "@/lib/actions/customer.actions";
 import { Trash } from "lucide-react";
 import { useState } from "react";
 
-const DeleteAppointment = ({ appointmentId }: { appointmentId: string }) => {
+interface DeleteAppointmentProps {
+  appointmentId: string;
+  iconSize?: number;
+}
+
+const DeleteAppointment = ({ appointmentId, iconSize = 20 }: DeleteAppointmentProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDelete = async () => {
@@ -16,7 +21,7 @@ const DeleteAppointment = ({ appointmentId }: { appointmentId: string }) => {
     } catch (error) {
       console.error(error);
     } finally {
-      setIsLoading(true);
+      setIsLoading(false);
     }
   };
 
@@ -26,7 +31,10 @@ const DeleteAppointment = ({ appointmentId }: { appointmentId: string }) => {
       disabled={isLoading}
       className="disabled:opacity-50 disabled:cursor-not-allowed"
     >
-      <Trash className="h-5 text-yellow-500 hover:text-red-500" />
+      <Trash
+        style={{ width: iconSize, height: iconSize }}
+        className="text-yellow-500 hover:text-red-500"
+      />
     </button>
   );
 };

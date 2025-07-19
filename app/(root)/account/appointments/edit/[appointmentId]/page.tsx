@@ -20,6 +20,7 @@ const EditAppointment = async ({
       <AppointmentForm
         userId={user.$id}
         customerId={customer.$id}
+        customer={customer}
         appointmentToEdit={appointment}
       />
     </div>

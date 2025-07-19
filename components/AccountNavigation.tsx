@@ -11,11 +11,11 @@ const navLinks = [
     href: "/account",
     icon: <House className="h-5 w-5 text-yellow-500" />,
   },
-  {
-    name: "Profil",
-    href: "/account/profile",
-    icon: <User className="h-5 w-5 text-yellow-500" />,
-  },
+  // {
+  //   name: "Profil",
+  //   href: "/account/profile",
+  //   icon: <User className="h-5 w-5 text-yellow-500" />,
+  // },
   {
     name: "Vaši termini",
     href: "/account/appointments",

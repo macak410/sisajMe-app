@@ -5,14 +5,15 @@ import {
   editAppointment,
 } from "@/lib/actions/appointment.action";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
-import { useForm, Controller } from "react-hook-form";
-import Select, { StylesConfig } from "react-select";
+import { Appointment, Customer } from "@/types/appwrite.types";
+import { useForm } from "react-hook-form";
+import Select, { CSSObjectWithLabel, OptionProps } from "react-select";
+import type { StylesConfig, GroupBase } from "react-select";
 import Button from "../Button";
 import DateSelector from "../DateSelector";
 import FormRow from "./FormRow";
-import { Appointment, Customer } from "@/types/appwrite.types";
 
 interface AppointmentProps {
   userId: string;
@@ -24,11 +25,6 @@ interface AppointmentProps {
 interface OptionType {
   value: string;
   label: string;
-}
-
-interface Inputs {
-  barber: OptionType;
-  service: OptionType;
 }
 
 const barberOptions: OptionType[] = [
@@ -44,7 +40,7 @@ const serviceOptions: OptionType[] = [
   { value: "Brijanje", label: "Brijanje" },
 ];
 
-const selectStyles: StylesConfig<OptionType, false> = {
+const selectStyles: StylesConfig<OptionType, false, GroupBase<OptionType>> = {
   singleValue: (provided) => ({
     ...provided,
     color: "white",
@@ -74,17 +70,28 @@ const AppointmentForm = ({
   appointmentToEdit,
 }: AppointmentProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [barberOption, setBarberOption] = useState<OptionType | null>(null);
+  const [serviceOption, setServiceOption] = useState<OptionType | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const router = useRouter();
+  const { handleSubmit } = useForm();
 
-  const {
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<Inputs>();
+  useEffect(() => {
+    if (appointmentToEdit) {
+      const existingBarber = barberOptions.find(
+        (opt) => opt.value === appointmentToEdit.barber
+      );
+      const existingService = serviceOptions.find(
+        (opt) => opt.value === appointmentToEdit.serviceType
+      );
+      setBarberOption(existingBarber || null);
+      setServiceOption(existingService || null);
+      setStartDate(new Date(appointmentToEdit.scheduleDate));
+    }
+  }, [appointmentToEdit]);
 
-  const onSubmit = async (data: Inputs) => {
-    if (!startDate) return;
+  const onSubmit = async () => {
+    if (!barberOption || !serviceOption || !startDate) return;
 
     setIsLoading(true);
     try {
@@ -92,8 +99,8 @@ const AppointmentForm = ({
         userId,
         customer: customerId,
         customerName: customer.fullName,
-        barber: data.barber.value,
-        serviceType: data.service.value,
+        barber: barberOption.value,
+        serviceType: serviceOption.value,
         scheduleDate: startDate,
         status: "pending",
       };
@@ -107,8 +114,8 @@ const AppointmentForm = ({
           `/customers/${userId}/new-appointment/confirmed?appointmentId=${response.$id}`
         );
       }
-    } catch (err: any) {
-      console.error("Greška pri zakazivanju termina:", err.message);
+    } catch (error: any) {
+      console.error("Greška pri zakazivanju:", error.message);
     } finally {
       setIsLoading(false);
     }
@@ -119,49 +126,35 @@ const AppointmentForm = ({
       {!appointmentToEdit && (
         <section className="mb-12 space-y-4">
           <h1 className="heading-h1">Zakažite svoj termin ✂️</h1>
-          <p className="text-textGray-500">Pošaljite zahtjev za vaš termin</p>
+          <p className="text-textGray-500">
+            Pošaljite zahtjev za vaš termin
+          </p>
         </section>
       )}
 
       <div className="space-y-5">
         <FormRow label="Frizeri" htmlFor="barber">
-          <Controller
+          <Select
             name="barber"
-            control={control}
-            rules={{ required: "Odaberite frizera" }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                styles={selectStyles}
-                options={barberOptions}
-                isDisabled={isLoading}
-                placeholder="Odaberite frizera"
-              />
-            )}
+            styles={selectStyles}
+            options={barberOptions}
+            value={barberOption}
+            onChange={(option) => setBarberOption(option as OptionType)}
+            isDisabled={isLoading}
+            placeholder="Odaberite frizera"
           />
-          {errors.barber && (
-            <p className="text-red-500 text-sm mt-1">{errors.barber.message}</p>
-          )}
         </FormRow>
 
         <FormRow label="Vrsta usluge" htmlFor="service">
-          <Controller
-            name="service"
-            control={control}
-            rules={{ required: "Odaberite uslugu" }}
-            render={({ field }) => (
-              <Select
-                {...field}
-                styles={selectStyles}
-                options={serviceOptions}
-                isDisabled={isLoading}
-                placeholder="Odaberite vrstu usluge"
-              />
-            )}
+          <Select
+            name="serviceType"
+            options={serviceOptions}
+            styles={selectStyles}
+            value={serviceOption}
+            onChange={(option) => setServiceOption(option as OptionType)}
+            isDisabled={isLoading}
+            placeholder="Odaberite uslugu"
           />
-          {errors.service && (
-            <p className="text-red-500 text-sm mt-1">{errors.service.message}</p>
-          )}
         </FormRow>
 
         <FormRow label="Datum termina" htmlFor="appointmentDate">
@@ -169,16 +162,12 @@ const AppointmentForm = ({
             startDate={startDate}
             setStartDate={setStartDate}
             isLoading={isLoading}
-            showError={!startDate}
           />
         </FormRow>
       </div>
 
-      <Button
-        size="full"
-        disabled={isLoading || !startDate || Object.keys(errors).length > 0}
-      >
-        Pošalji
+      <Button size="full" disabled={isLoading || !startDate}>
+        {!appointmentToEdit ? "Pošalji" : "Spremi izmjene"}
       </Button>
     </form>
   );

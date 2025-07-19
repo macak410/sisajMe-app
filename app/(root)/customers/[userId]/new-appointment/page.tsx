@@ -19,7 +19,7 @@ const Appointment = async ({ params }: AppointmentParams) => {
   return (
     <div className="flex h-screen max-h-screen">
       <section className="container my-auto">
-        <div className="sub-container max-w-[860px] justify-between">
+        <div className="sub-container max-w-[1400px] justify-between">
           <div>
             <Link href="/" className="inline-block mb-12">
               <Image
