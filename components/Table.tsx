@@ -17,8 +17,8 @@ interface ChildrenProps {
 }
 
 interface BodyProps<T> {
-  data: T[];
-  render: (item: T, index: number) => ReactNode;
+  data: T[] | undefined;
+  render: (item: T, index: number) => React.ReactNode;
 }
 
 const TableContext = createContext<TableContextProps | undefined>(undefined);
@@ -82,7 +82,7 @@ const Row: FC<ChildrenProps> = ({ children }) => {
 };
 
 const Body = <T,>({ data, render }: BodyProps<T>) => {
-  if (!data.length)
+  if (!data || data.length === 0)
     return (
       <p className="text-center p-6 font-medium">
         Trenutno nema podataka za prikaz

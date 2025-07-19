@@ -12,7 +12,7 @@ const Home = async () => {
       <section className="container my-auto">
         <div className="sub-container max-w-[1400px] justify-between">
           <div>
-            <Link href="/" className="inline-block mb-12">
+            <Link href="/account" className="inline-block mb-12">
               <Image
                 src="/assets/imgs/logo-barbershop.jpg"
                 width={1000}

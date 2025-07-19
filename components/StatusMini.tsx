@@ -7,6 +7,12 @@ interface StatusMiniProps {
   status: string;
 }
 
+const statusLabels: Record<string, string> = {
+  confirmed: "Potvrđeno",
+  pending: "Čeka potvrdu",
+  declined: "Odbijeno",
+};
+
 const StatusMini: FC<StatusMiniProps> = ({ status }) => {
   const icons = {
     confirmed: <CircleCheck />,
@@ -28,7 +34,7 @@ const StatusMini: FC<StatusMiniProps> = ({ status }) => {
       {status === "confirmed" || status === "pending" || status === "declined"
         ? icons[status]
         : null}
-      <p className="font-medium">{capitalizeFirstLetter(status)}</p>
+      <p className="font-medium">{statusLabels[status] || status}</p>
     </div>
   );
 };

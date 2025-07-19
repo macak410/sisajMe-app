@@ -20,7 +20,7 @@ const SuccessPage = () => {
   return (
     <div className="flex h-screen min-h-screen px-[5%]">
       <div className="m-auto flex flex-col items-center justify-between gap-10 py-10">
-        <Link href="/" className="mb-8">
+        <Link href="/account" className="mb-8">
           <Image
             src="/assets/imgs/logo-barbershop.jpg"
             width={1000}

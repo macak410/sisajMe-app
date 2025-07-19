@@ -122,15 +122,36 @@ export const getAppointments = async () => {
   try {
     const { database } = await createAdminClient();
 
-    const appointments = await database.listDocuments(
+    const rawAppointments = await database.listDocuments(
       databaseId,
       collectionId,
       [Query.orderDesc("$updatedAt")]
     );
 
-    return parseStringify(appointments.documents);
+    const appointments = await Promise.all(
+      rawAppointments.documents.map(async (appt) => {
+        try {
+          const customerDoc = await database.getDocument(
+            databaseId,
+            process.env.CUSTOMER_COLLECTION_ID!,
+            appt.customer // pretpostavljamo da je ovo customerId kao string
+          );
+
+          return {
+            ...appt,
+            customer: parseStringify(customerDoc),
+          };
+        } catch (err) {
+          console.warn("Greška pri dohvaćanju korisnika:", err);
+          return { ...appt, customer: null };
+        }
+      })
+    );
+
+    return parseStringify(appointments);
   } catch (error) {
     console.error("Greška pri listanju svih termina:", error);
+    return [];
   }
 };
 

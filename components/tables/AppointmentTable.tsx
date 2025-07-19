@@ -2,6 +2,7 @@
 
 import { Appointment } from "@/types/appwrite.types";
 import { format } from "date-fns";
+import { hr } from "date-fns/locale";
 import AppointmentAction from "../AppointmentAction";
 import StatusMini from "../StatusMini";
 import Table from "../Table";
@@ -27,9 +28,12 @@ const AppointmentTable = ({
         render={(appointment, i) => (
           <Table.Row key={appointment.$id}>
             <p>{i}</p>
-            <p>{appointment.customer.fullName}</p>
+            <div>
+              <p>{appointment.customer?.fullName || "Nepoznato"}</p>
+              <p className="text-sm text-textGray-400">{appointment.customer?.email}</p>
+            </div>
             <StatusMini status={appointment.status} />
-            <p>{format(appointment.scheduleDate, "MMMM dd, yyyy HH:mm")}</p>
+            <p>{format(new Date(appointment.scheduleDate), "d. MMMM yyyy. HH:mm", { locale: hr })}</p>
             <p>{appointment.barber}</p>
             <div className="flex items-center gap-2">
               <AppointmentAction
