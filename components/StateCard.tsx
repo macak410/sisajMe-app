@@ -24,7 +24,7 @@ const StateCard: FC<StateCardProps> = ({
       <Icon size={64} color={colors[state]} />
       <div>
         <h4 className="text-xl font-medium text-textGray-500">{label}</h4>
-        <p className="text-4xl font-bold">{count}</p>
+        <p className="text-4xl font-bold text-center">{count}</p>
       </div>
     </div>
   );

@@ -46,7 +46,7 @@ const LoginForm = () => {
           <input
             type="email"
             className="input"
-            placeholder="Upišite Vaš e-mail"
+            placeholder="Unesite Vaš e-mail"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}

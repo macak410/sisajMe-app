@@ -39,17 +39,17 @@ const DashboardPage = async () => {
 
   return (
     <div className="min-h-screen w-full overflow-x-hidden px-4 pt-4 pb-16 sm:px-6 lg:px-12">
-      <header className="sticky top-3 z-30 flex items-center justify-between rounded-2xl bg-dark-200 px-[5%] py-5 shadow-lg">
+      <header className="sticky top-3 z-30 flex flex-col items-center sm:flex-row sm:justify-between gap-4 rounded-2xl bg-dark-200 px-[5%] py-5 shadow-lg">
         <Link href="/account" className="cursor-pointer">
           <Image
             src="/assets/imgs/logo-barbershop.jpg"
             width={1000}
             height={1000}
             alt="logo"
-            className="h-40 w-fit"
+            className="h-32 sm:h-40 w-auto"
           />
         </Link>
-        <p className="text-lg font-medium">Nadzorna ploča</p>
+        <p className="text-lg font-medium max-[400px]:mt-3">Nadzorna ploča</p>
       </header>
 
       <main className="mt-6 space-y-8">

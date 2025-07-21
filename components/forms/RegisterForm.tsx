@@ -82,7 +82,7 @@ const RegisterForm = () => {
             <input
               type="email"
               id="email"
-              placeholder="Upišite Vaš e-mail"
+              placeholder="Unesite Vaš e-mail"
               disabled={isLoading}
               className="input"
               {...register("email", {

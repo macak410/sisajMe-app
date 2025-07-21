@@ -47,6 +47,9 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-sans)", ...fontFamily.sans],
       },
+      screens: {
+        xs: { max: "400px" },
+      },
     },
   },
   plugins: [],
