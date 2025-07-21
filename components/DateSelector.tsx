@@ -179,9 +179,9 @@ const DateSelector = ({
 
     if (!startDate) {
       return (
-        <div className="flex items-center justify-center h-48 text-center">
+        <div className="flex items-center justify-center h-full min-h-[200px] text-center">
           <p className="text-base text-gray-400 italic font-medium">
-            👈 Prvo odaberite datum s kalendara
+            👈 Prvo odaberite datum iz kalendara
           </p>
         </div>
       );

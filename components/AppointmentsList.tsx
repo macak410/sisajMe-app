@@ -23,7 +23,9 @@ const AppointmentsList = ({ appointments }: { appointments: Appointment[] }) => 
 
         <ul className="space-y-5 w-full">
           {appointments.map((appointment, i) => {
-            const isExpired = isPast(appointment.scheduleDate);
+            const isExpired = isPast(new Date(appointment.scheduleDate));
+            const canModify =
+              !isExpired && ["pending", "confirmed"].includes(appointment.status);
 
             return (
               <li
@@ -43,11 +45,13 @@ const AppointmentsList = ({ appointments }: { appointments: Appointment[] }) => 
                 </div>
                 <div className="flex items-center justify-end gap-4 text-white">
                   {!isExpired && <StatusBadge status={appointment.status} />}
-                  {!isExpired && appointment.status === "pending" && (
+                  {canModify && (
                     <>
-                      <Link href={`/account/appointments/edit/${appointment.$id}`}>
-                        <Edit className="h-5 w-5 text-yellow-500 hover:text-blue-500 transition-transform hover:scale-110" />
-                      </Link>
+                      {appointment.status === "pending" && (
+                        <Link href={`/account/appointments/edit/${appointment.$id}`}>
+                          <Edit className="h-5 w-5 text-yellow-500 hover:text-blue-500 transition-transform hover:scale-110" />
+                        </Link>
+                      )}
                       <DeleteAppointment appointmentId={appointment.$id} />
                     </>
                   )}
@@ -61,7 +65,9 @@ const AppointmentsList = ({ appointments }: { appointments: Appointment[] }) => 
       {/* Mobilni prikaz */}
       <ul className="space-y-5 md:hidden">
         {appointments.map((appointment, i) => {
-          const isExpired = isPast(appointment.scheduleDate);
+          const isExpired = isPast(new Date(appointment.scheduleDate));
+          const canModify =
+            !isExpired && ["pending", "confirmed"].includes(appointment.status);
 
           return (
             <li
@@ -89,11 +95,13 @@ const AppointmentsList = ({ appointments }: { appointments: Appointment[] }) => 
                 </p>
               </div>
 
-              {!isExpired && appointment.status === "pending" && (
+              {canModify && (
                 <div className="flex items-center gap-5 justify-end max-[767px]:justify-start max-[479px]:justify-center max-[479px]:pt-2">
-                  <Link href={`/account/appointments/edit/${appointment.$id}`}>
-                    <Edit className="h-7 w-7 text-yellow-500 hover:text-blue-500 transition-transform hover:scale-110" />
-                  </Link>
+                  {appointment.status === "pending" && (
+                    <Link href={`/account/appointments/edit/${appointment.$id}`}>
+                      <Edit className="h-7 w-7 text-yellow-500 hover:text-blue-500 transition-transform hover:scale-110" />
+                    </Link>
+                  )}
                   <DeleteAppointment appointmentId={appointment.$id} iconSize={28} />
                 </div>
               )}

@@ -144,6 +144,25 @@ const AppointmentForm = ({
 
         <FormRow label="Datum termina" htmlFor="appointmentDate">
           <DateSelector startDate={startDate} setStartDate={setStartDate} isLoading={isLoading} />
+          
+          <div className="mt-6 space-y-2">
+            <h4 className="text-sm font-semibold text-white">Legenda:</h4>
+            <div className="flex items-center gap-3 text-sm text-white">
+              <span className="w-4 h-4 bg-blue-200 rounded border border-white" />
+              <span>Termin u čekanju odobrenja</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm text-white">
+              <div className="relative w-4 h-4 bg-dark-600 rounded border border-white opacity-40">
+                <div className="absolute left-0 top-1/2 w-full h-[2px] bg-white rotate-0 -translate-y-1/2" />
+              </div>
+              <span>Termin zauzet (potvrđen)</span>
+            </div>
+            <div className="flex items-center gap-3 text-sm text-white">
+              <span className="w-4 h-4 bg-yellow-400 rounded border border-white" />
+              <span>Vaš odabrani termin</span>
+            </div>
+          </div>
+
         </FormRow>
       </div>
 

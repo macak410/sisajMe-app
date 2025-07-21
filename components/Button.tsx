@@ -11,10 +11,12 @@ const buttonVariants = cva(
         default: "bg-yellow-500 hover:bg-yellow-500/90",
         destructive: "bg-red-500 hover:bg-red-500/90",
         link: "text-yellow-500 underline-offset-4 hover:underline font-medium",
+        outline: "border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black",
       },
       size: {
         default: "h-12 px-4 py-2",
         full: "w-full h-12",
+        small: "h-8 px-3 py-1 text-sm",
       },
     },
     defaultVariants: {

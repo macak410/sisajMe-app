@@ -136,7 +136,7 @@ export const getAppointments = async () => {
           const customerDoc = await database.getDocument(
             databaseId,
             process.env.CUSTOMER_COLLECTION_ID!,
-            appt.customer // pretpostavljamo da je ovo customerId kao string
+            appt.customer
           );
 
           return {
@@ -171,5 +171,20 @@ export const getCustomerAppointments = async (userId: string) => {
   } catch (error) {
     console.error("Greška pri dohvaćanju korisničkih termina:", error);
     return [];
+  }
+};
+
+export const cancelAppointment = async (appointmentId: string, reason: string) => {
+  try {
+    const { database } = await createAdminClient();
+
+    await database.updateDocument(databaseId, collectionId, appointmentId, {
+      status: "cancelled",
+      cancellationReason: reason,
+    });
+
+    revalidatePath("/account/appointments");
+  } catch (error) {
+    throw new Error("Greška pri otkazivanju termina");
   }
 };
