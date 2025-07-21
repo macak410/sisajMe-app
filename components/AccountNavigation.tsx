@@ -43,7 +43,7 @@ const AccountNavigation = () => {
           </li>
         ))}
 
-        <li className="mt-10">
+        <li className="mt-1">
           <Logout />
         </li>
       </ul>
