@@ -14,30 +14,31 @@ export const metadata = {
 
 export const dynamic = "force-dynamic";
 
-const AdminPage = async () => {
+const DashboardPage = async () => {
   const user = await getLoggedInUser();
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL!;
   const appointments: Appointment[] = await getAppointments();
+
   const statusCounts = Array.isArray(appointments)
-  ? appointments.reduce(
-      (acc, appointment) => {
-        if (
-          appointment.status === "confirmed" ||
-          appointment.status === "pending" ||
-          appointment.status === "declined"
-        ) {
-          acc[appointment.status] += 1;
-        }
-        return acc;
-      },
-      { confirmed: 0, pending: 0, declined: 0 }
-    )
-  : { confirmed: 0, pending: 0, declined: 0 };
+    ? appointments.reduce(
+        (acc, appointment) => {
+          if (
+            appointment.status === "confirmed" ||
+            appointment.status === "pending" ||
+            appointment.status === "declined"
+          ) {
+            acc[appointment.status] += 1;
+          }
+          return acc;
+        },
+        { confirmed: 0, pending: 0, declined: 0 }
+      )
+    : { confirmed: 0, pending: 0, declined: 0 };
 
   if (!user || user.email !== ADMIN_EMAIL) return notFound();
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col space-y-14 px-3 xl:px-12 pt-5 pb-24">
+    <div className="min-h-screen w-full overflow-x-hidden px-4 pt-4 pb-16 sm:px-6 lg:px-12">
       <header className="sticky top-3 z-30 flex items-center justify-between rounded-2xl bg-dark-200 px-[5%] py-5 shadow-lg">
         <Link href="/account" className="cursor-pointer">
           <Image
@@ -48,33 +49,30 @@ const AdminPage = async () => {
             className="h-40 w-fit"
           />
         </Link>
-
         <p className="text-lg font-medium">Nadzorna ploča</p>
       </header>
 
-      <main>
-        <section className="mb-12 space-y-4">
+      <main className="mt-6 space-y-8">
+        <section className="space-y-4 text-center sm:text-left">
           <h1 className="heading-h1">Dobrodošli, {user.name} 👋</h1>
-          <p className="text-textGray-500">
+          <p className="text-textGray-500 text-lg font-medium">
             Kontrolirajte termine i klijente po želji
           </p>
         </section>
 
-        <section className="flex w-full flex-col justify-between gap-5 sm:flex-row flex-wrap xl:gap-10 mb-16">
+        <section className="flex flex-col flex-wrap gap-5 sm:flex-row sm:justify-between xl:gap-10">
           <StateCard
             state="confirmed"
             count={statusCounts.confirmed}
             label="Potvrđeni termini"
             icon={CalendarCheck}
           />
-
           <StateCard
             state="pending"
             count={statusCounts.pending}
             label="Čeka na potvrdu"
             icon={CalendarClock}
           />
-
           <StateCard
             state="declined"
             count={statusCounts.declined}
@@ -89,4 +87,4 @@ const AdminPage = async () => {
   );
 };
 
-export default AdminPage;
+export default DashboardPage;

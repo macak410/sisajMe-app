@@ -23,8 +23,9 @@
   }
 }
 
-body {
-  overflow: hidden;
+html, body {
+  height: auto;
+  overflow-x: hidden;
 }
 
 .loader {
