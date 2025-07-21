@@ -12,6 +12,8 @@ export const metadata = {
   title: "Dashboard",
 };
 
+export const dynamic = "force-dynamic";
+
 const AdminPage = async () => {
   const user = await getLoggedInUser();
   const ADMIN_EMAIL = process.env.ADMIN_EMAIL!;
