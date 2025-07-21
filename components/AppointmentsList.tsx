@@ -1,9 +1,12 @@
+"use client";
+
 import { Appointment } from "@/types/appwrite.types";
 import { format, isPast } from "date-fns";
 import { hr } from "date-fns/locale";
 import { CalendarDays, Edit } from "lucide-react";
 import Link from "next/link";
 import DeleteAppointment from "./DeleteAppointment";
+import StatusBadge from "./StatusBadge";
 
 const AppointmentsList = ({ appointments }: { appointments: Appointment[] }) => {
   return (
@@ -22,17 +25,6 @@ const AppointmentsList = ({ appointments }: { appointments: Appointment[] }) => 
           {appointments.map((appointment, i) => {
             const isExpired = isPast(appointment.scheduleDate);
 
-            const statusBadge =
-              appointment.status === "confirmed" ? (
-                <span className="px-2 py-0.5 text-xs rounded-full bg-green-600 text-white whitespace-nowrap">
-                  Potvrđeno
-                </span>
-              ) : (
-                <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-500 text-black whitespace-nowrap">
-                  Čeka potvrdu
-                </span>
-              );
-
             return (
               <li
                 key={appointment.$id}
@@ -41,21 +33,16 @@ const AppointmentsList = ({ appointments }: { appointments: Appointment[] }) => 
                 }`}
               >
                 <p className="text-lg font-bold text-accent-400 text-center">#{i + 1}</p>
-
                 <p className="truncate font-medium text-base text-white">{appointment.barber}</p>
-
                 <p className="truncate text-white">{appointment.serviceType}</p>
-
                 <div className="flex items-center gap-2 text-sm text-white truncate">
                   <CalendarDays className="h-5 w-5 shrink-0" />
                   {format(new Date(appointment.scheduleDate), "d. MMMM yyyy. 'u' HH:mm", {
                     locale: hr,
                   })}
                 </div>
-
                 <div className="flex items-center justify-end gap-4 text-white">
-                  {!isExpired && statusBadge}
-
+                  {!isExpired && <StatusBadge status={appointment.status} />}
                   {!isExpired && appointment.status === "pending" && (
                     <>
                       <Link href={`/account/appointments/edit/${appointment.$id}`}>
@@ -76,45 +63,24 @@ const AppointmentsList = ({ appointments }: { appointments: Appointment[] }) => 
         {appointments.map((appointment, i) => {
           const isExpired = isPast(appointment.scheduleDate);
 
-          const statusBadge =
-            appointment.status === "confirmed" ? (
-              <span className="px-2 py-0.5 text-xs rounded-full bg-green-600 text-white whitespace-nowrap">
-                Potvrđeno
-              </span>
-            ) : (
-              <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-500 text-black whitespace-nowrap">
-                Čeka potvrdu
-              </span>
-            );
-
           return (
             <li
               key={appointment.$id}
-              className={`
-                grid grid-cols-[1fr_auto] 
-                max-[479px]:grid-cols-1 items-center 
-                max-[479px]:text-center rounded-xl bg-dark-500 p-5 shadow-md gap-4 text-white
-                ${isExpired ? "opacity-50 grayscale" : ""}
-              `}
+              className={`grid grid-cols-[1fr_auto] max-[479px]:grid-cols-1 items-center max-[479px]:text-center rounded-xl bg-dark-500 p-5 shadow-md gap-4 text-white ${
+                isExpired ? "opacity-50 grayscale" : ""
+              }`}
             >
-              {/* Sadržaj termina */}
               <div className="space-y-2 text-sm max-[479px]:items-center max-[479px]:flex max-[479px]:flex-col w-full">
                 <div className="flex items-center justify-start gap-2 flex-wrap">
                   <p className="font-bold text-base text-accent-400">Termin #{i + 1}</p>
-                  {!isExpired && appointment.status === "pending" && (
-                    <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-500 text-black whitespace-nowrap">
-                      Čeka potvrdu
-                    </span>
-                  )}
-                  {!isExpired && appointment.status === "confirmed" && (
-                    <span className="px-2 py-0.5 text-xs rounded-full bg-green-600 text-white whitespace-nowrap">
-                      Potvrđeno
-                    </span>
-                  )}
+                  {!isExpired && <StatusBadge status={appointment.status} />}
                 </div>
-
-                <p><span className="text-textGray-400">Frizer:</span> {appointment.barber}</p>
-                <p><span className="text-textGray-400">Usluga:</span> {appointment.serviceType}</p>
+                <p>
+                  <span className="text-textGray-400">Frizer:</span> {appointment.barber}
+                </p>
+                <p>
+                  <span className="text-textGray-400">Usluga:</span> {appointment.serviceType}
+                </p>
                 <p className="flex items-center gap-2">
                   <CalendarDays className="h-4 w-4 shrink-0" />
                   {format(new Date(appointment.scheduleDate), "d. MMMM yyyy. 'u' HH:mm", {
@@ -123,14 +89,8 @@ const AppointmentsList = ({ appointments }: { appointments: Appointment[] }) => 
                 </p>
               </div>
 
-              {/* Ikonice: edit + delete */}
               {!isExpired && appointment.status === "pending" && (
-                <div className="
-                  flex items-center gap-5 justify-end
-                  max-[767px]:justify-start
-                  max-[479px]:justify-center
-                  max-[479px]:pt-2
-                ">
+                <div className="flex items-center gap-5 justify-end max-[767px]:justify-start max-[479px]:justify-center max-[479px]:pt-2">
                   <Link href={`/account/appointments/edit/${appointment.$id}`}>
                     <Edit className="h-7 w-7 text-yellow-500 hover:text-blue-500 transition-transform hover:scale-110" />
                   </Link>

@@ -1,14 +1,10 @@
 "use client";
 
-import {
-  createAppointment,
-  editAppointment,
-} from "@/lib/actions/appointment.action";
+import { createAppointment, editAppointment } from "@/lib/actions/appointment.action";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { Appointment, Customer } from "@/types/appwrite.types";
-import { useForm } from "react-hook-form";
 import Select, { CSSObjectWithLabel, OptionProps } from "react-select";
 import type { StylesConfig, GroupBase } from "react-select";
 import Button from "../Button";
@@ -41,10 +37,7 @@ const serviceOptions: OptionType[] = [
 ];
 
 const selectStyles: StylesConfig<OptionType, false, GroupBase<OptionType>> = {
-  singleValue: (provided) => ({
-    ...provided,
-    color: "white",
-  }),
+  singleValue: (provided) => ({ ...provided, color: "white" }),
   control: (provided) => ({
     ...provided,
     backgroundColor: "#262626",
@@ -53,10 +46,7 @@ const selectStyles: StylesConfig<OptionType, false, GroupBase<OptionType>> = {
     borderColor: "#4F4F4F",
     boxShadow: "none",
   }),
-  menu: (provided) => ({
-    ...provided,
-    backgroundColor: "#262626",
-  }),
+  menu: (provided) => ({ ...provided, backgroundColor: "#262626" }),
   option: (provided, state) => ({
     ...provided,
     backgroundColor: state.isSelected ? "#1D1D1D" : "#262626",
@@ -74,13 +64,10 @@ const AppointmentForm = ({
   const [serviceOption, setServiceOption] = useState<OptionType | null>(null);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const router = useRouter();
-  const { handleSubmit } = useForm();
 
   useEffect(() => {
     if (appointmentToEdit) {
-      const existingBarber = barberOptions.find(
-        (opt) => opt.value === appointmentToEdit.barber
-      );
+      const existingBarber = barberOptions.find((opt) => opt.value === appointmentToEdit.barber);
       const existingService = serviceOptions.find(
         (opt) => opt.value === appointmentToEdit.serviceType
       );
@@ -90,12 +77,12 @@ const AppointmentForm = ({
     }
   }, [appointmentToEdit]);
 
-  const onSubmit = async () => {
+  const handleSubmit = async () => {
     if (!barberOption || !serviceOption || !startDate) return;
 
     setIsLoading(true);
     try {
-      const appointmentPayload = {
+      const payload = {
         userId,
         customer: customerId,
         customerName: customer.fullName,
@@ -106,29 +93,27 @@ const AppointmentForm = ({
       };
 
       const response = appointmentToEdit
-        ? await editAppointment(appointmentToEdit.$id, userId, appointmentPayload)
-        : await createAppointment(appointmentPayload);
+        ? await editAppointment(appointmentToEdit.$id, userId, payload)
+        : await createAppointment(payload);
 
       if (response) {
         router.push(
           `/customers/${userId}/new-appointment/confirmed?appointmentId=${response.$id}`
         );
       }
-    } catch (error: any) {
-      console.error("Greška pri zakazivanju:", error.message);
+    } catch (error) {
+      console.error("Greška pri zakazivanju:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex-1 space-y-6">
+    <div className="flex-1 space-y-6">
       {!appointmentToEdit && (
         <section className="mb-12 space-y-4">
           <h1 className="heading-h1">Zakažite svoj termin ✂️</h1>
-          <p className="text-textGray-500">
-            Pošaljite zahtjev za vaš termin
-          </p>
+          <p className="text-textGray-500">Pošaljite zahtjev za vaš termin</p>
         </section>
       )}
 
@@ -158,18 +143,18 @@ const AppointmentForm = ({
         </FormRow>
 
         <FormRow label="Datum termina" htmlFor="appointmentDate">
-          <DateSelector
-            startDate={startDate}
-            setStartDate={setStartDate}
-            isLoading={isLoading}
-          />
+          <DateSelector startDate={startDate} setStartDate={setStartDate} isLoading={isLoading} />
         </FormRow>
       </div>
 
-      <Button size="full" disabled={isLoading || !startDate}>
+      <Button
+        size="full"
+        disabled={isLoading || !barberOption || !serviceOption || !startDate}
+        onClick={handleSubmit}
+      >
         {!appointmentToEdit ? "Pošalji" : "Spremi izmjene"}
       </Button>
-    </form>
+    </div>
   );
 };
 

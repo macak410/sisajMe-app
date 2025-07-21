@@ -64,6 +64,8 @@ export const editAppointment = async (
     if (!editedAppointment) throw new Error("Uređivanje nije uspjelo");
 
     revalidatePath("/account/appointments");
+    revalidatePath("/account/reservations");
+
     return parseStringify(editedAppointment);
   } catch (error) {
     console.error("Greška pri uređivanju:", error);
@@ -125,7 +127,7 @@ export const getAppointments = async () => {
     const rawAppointments = await database.listDocuments(
       databaseId,
       collectionId,
-      [Query.orderDesc("$updatedAt")]
+      [Query.orderDesc("scheduleDate")]
     );
 
     const appointments = await Promise.all(
@@ -162,7 +164,7 @@ export const getCustomerAppointments = async (userId: string) => {
     const appointments = await database.listDocuments(
       databaseId,
       collectionId,
-      [Query.equal("userId", userId), Query.orderDesc("$updatedAt")]
+      [Query.equal("userId", userId), Query.orderDesc("scheduleDate")]
     );
 
     return parseStringify(appointments.documents);
