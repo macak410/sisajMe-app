@@ -105,7 +105,6 @@ export const logout = async () => {
     redirect("/sign-in");
   } catch (err) {
     console.error("Logout greška:", err);
-    return null;
   }
 };
 
