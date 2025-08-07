@@ -18,7 +18,7 @@ const DeleteAppointment = ({ appointmentId, iconSize = 20 }: Props) => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // ✅ Scroll lock i scrollBar kompenzacija
+  // Scroll lock i scrollBar kompenzacija
   useEffect(() => {
     if (isOpen) {
       const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth;

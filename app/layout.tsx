@@ -3,7 +3,7 @@ import { Karla } from 'next/font/google';
 import './globals.css';
 
 import { cn } from '@/lib/utils';
-import Providers from '@/components/Providers'; // ako koristiš kontekste
+import Providers from '@/components/Providers';
 
 const fontSans = Karla({
   subsets: ['latin'],
@@ -14,9 +14,13 @@ const fontSans = Karla({
 export const metadata: Metadata = {
   title: {
     template: '%s | ŠišajMe',
-    default: 'Welcome | ŠišajMe',
+    default: 'ŠišajMe',
   },
-  description: 'ŠišajMe is an application for haircut appointments.',
+  description: 'ŠišajMe je aplikacija za rezervaciju termina šišanja.',
+  icons: {
+    icon: '../public/favicon.ico',
+    shortcut: '../public/favicon.ico',
+  },
 };
 
 export default function RootLayout({
@@ -25,20 +29,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <link rel="icon" href="/favicon.ico" />
-        {/* Možeš dodati i <meta> tagove ovdje ako želiš */}
-      </head>
+    <html lang="hr" suppressHydrationWarning>
       <body
         className={cn(
           'min-h-screen bg-dark-300 text-white font-sans antialiased',
           fontSans.variable
         )}
       >
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
